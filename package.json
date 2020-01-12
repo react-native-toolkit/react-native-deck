@@ -1,0 +1,25 @@
+{
+  "name": "react-native-deck",
+  "version": "0.0.1",
+  "description": "Create cross platform slides & real world presentations in your react native project",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "react-native",
+    "deck",
+    "slides",
+    "presentation"
+  ],
+  "author": "DaniAkash",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "husky": "^4.0.7",
+    "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.1",
+    "typescript": "^3.7.4"
+  }
+}
