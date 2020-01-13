@@ -1,5 +1,5 @@
 {
   "hooks": {
-    "pre-commit": "pretty-quick --staged && sh precommit-lint.sh"
+    "pre-commit": "pretty-quick --staged"
   }
 }
