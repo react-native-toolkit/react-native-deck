@@ -1,6 +1,6 @@
-import Deck from "./Components/Deck";
-import Slide from "./Components/Slide";
+import DeckComponent from "./Components/Deck";
+import SlideComponent from "./Components/Slide";
 
-const myObject = { Deck, Slide };
+export const Slide = SlideComponent;
 
-export default myObject;
+export const Deck = DeckComponent;
