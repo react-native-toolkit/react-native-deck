@@ -1,19 +1,33 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { NavigationNativeContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import Home from "./screens/HomeScreen/Home";
+import SimpleExample from "./presentations/SimpleExample/SimpleExample";
 
-export default function App() {
+export type RootStackParamList = {
+  Home: undefined;
+  SimpleExample: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-    </View>
+    <NavigationNativeContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ title: "React Native Deck" }}
+        />
+        <Stack.Screen
+          name="SimpleExample"
+          component={SimpleExample}
+          options={{ title: "A Simple Presentation for explaining RNDeck" }}
+        />
+      </Stack.Navigator>
+    </NavigationNativeContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center"
-  }
-});
+export default App;
