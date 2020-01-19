@@ -22,6 +22,8 @@ export interface SlideNode {
   nextStage: () => boolean;
   prevStage: () => boolean;
   jumpToLastStage: () => void;
+  stageCount: number;
+  activeStageIndex: number;
 }
 
 export interface SlideInterface extends RefObject<SlideNode> {
@@ -34,6 +36,32 @@ class Deck extends Component<DeckProps, DeckState> {
     activeSlideIndex: 0
   };
   $activeSlide: SlideInterface = createRef();
+
+  get slideCount() {
+    return this.state.slides.length;
+  }
+
+  get activeSlideIndex() {
+    return this.state.activeSlideIndex;
+  }
+
+  get slideStageCount() {
+    if (this.$activeSlide.current) {
+      const { stageCount = 0 } = this.$activeSlide.current;
+      return stageCount;
+    } else {
+      return 0;
+    }
+  }
+
+  get slideActiveStageIndex() {
+    if (this.$activeSlide.current) {
+      const { activeStageIndex = 0 } = this.$activeSlide.current;
+      return activeStageIndex;
+    } else {
+      return 0;
+    }
+  }
 
   setSlides = (childrenWithProps: ReactNode[]) =>
     this.setState({ slides: childrenWithProps });

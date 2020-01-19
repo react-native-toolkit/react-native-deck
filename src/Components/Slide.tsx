@@ -32,6 +32,19 @@ class Slide extends Component<SlideProps, SlideState> {
   };
   $slideElement: ISlideElement = createRef() as ISlideElement;
 
+  get stageCount(): number {
+    if (this.$slideElement.current) {
+      const { stages = [] } = this.$slideElement.current;
+      return stages.length;
+    } else {
+      return 0;
+    }
+  }
+
+  get activeStageIndex(): number {
+    return this.state.activeStageIndex;
+  }
+
   setChildNode = (node: ReactNode) => this.setState({ ChildNode: node });
 
   setActiveStageIndex = (index: number) =>

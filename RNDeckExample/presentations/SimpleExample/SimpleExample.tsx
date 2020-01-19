@@ -1,4 +1,4 @@
-import React, { Component, useRef } from "react";
+import React, { Component, useRef, useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Deck, Slide } from "react-native-deck";
 
@@ -88,12 +88,25 @@ class SlideTest3 extends Component {
 
 const SimpleExample = () => {
   const $deckComponent = useRef(null);
+  const [deckStatistics, setDeckStatistics] = useState([0, 0, 0, 0]);
 
   const nextSlide = () =>
     $deckComponent.current && $deckComponent.current.nextSlide();
 
   const prevSlide = () =>
     $deckComponent.current && $deckComponent.current.prevSlide();
+
+  useEffect(() => {
+    const deckInstance = $deckComponent.current;
+    if (deckInstance) {
+      setDeckStatistics([
+        deckInstance.activeSlideIndex,
+        deckInstance.slideCount,
+        deckInstance.slideActiveStageIndex,
+        deckInstance.slideStageCount
+      ]);
+    }
+  });
 
   return (
     <View style={styles.container}>
@@ -114,6 +127,12 @@ const SimpleExample = () => {
       >
         <Text>{"Prev"}</Text>
       </TouchableOpacity>
+      <Text style={styles.infoText}>{`Current Slide - ${deckStatistics[0] +
+        1} | Total Slides - ${
+        deckStatistics[1]
+      } | Current Stage - ${deckStatistics[2] + 1} | Total Stages - ${
+        deckStatistics[3]
+      }`}</Text>
       <TouchableOpacity
         onPress={nextSlide}
         style={[styles.navButton, styles.next]}
@@ -140,6 +159,10 @@ const styles = StyleSheet.create({
   },
   next: {
     right: 40
+  },
+  infoText: {
+    position: "absolute",
+    bottom: 40
   }
 });
 
