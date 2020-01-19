@@ -20,6 +20,13 @@ const Home = ({ navigation }: HomeProps) => {
           onPress={() => navigation.navigate("SimpleExample")}
         />
       </View>
+      <View style={styles.button}>
+        <Button
+          title="App Development"
+          color="gold"
+          onPress={() => navigation.navigate("AppDevelopment")}
+        />
+      </View>
     </View>
   );
 };
