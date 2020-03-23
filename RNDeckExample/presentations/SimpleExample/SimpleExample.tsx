@@ -1,6 +1,6 @@
 import React, { Component, useRef, useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { Deck, Slide } from "react-native-deck";
+import { Deck, Slide, IDeckRef } from "react-native-deck";
 
 class SlideTest extends Component {
   state = {
@@ -87,7 +87,7 @@ class SlideTest3 extends Component {
 }
 
 const SimpleExample = () => {
-  const $deckComponent = useRef(null);
+  const $deckComponent = useRef<IDeckRef>(null);
   const [deckStatistics, setDeckStatistics] = useState([0, 0, 0, 0]);
 
   const nextSlide = () =>
@@ -106,20 +106,22 @@ const SimpleExample = () => {
         deckInstance.slideStageCount
       ]);
     }
-  });
+  }, []);
 
   return (
     <View style={styles.container}>
       <Deck ref={$deckComponent}>
-        <Slide>
-          <SlideTest />
-        </Slide>
-        <Slide>
-          <SlideTest2 />
-        </Slide>
-        <Slide>
-          <SlideTest3 />
-        </Slide>
+        {[
+          <Slide key={0}>
+            <SlideTest />
+          </Slide>,
+          <Slide key={1}>
+            <SlideTest2 />
+          </Slide>,
+          <Slide key={2}>
+            <SlideTest3 />
+          </Slide>
+        ]}
       </Deck>
       <TouchableOpacity
         onPress={prevSlide}
