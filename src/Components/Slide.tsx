@@ -26,7 +26,7 @@ export interface ISlideRef {
   readonly stageCount: number;
   readonly activeStageIndex: number;
   nextStage(): boolean;
-  prevState(): boolean;
+  prevStage(): boolean;
   jumpToLastStage(): false;
 }
 
@@ -57,7 +57,7 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
       }
       return false;
     },
-    prevState() {
+    prevStage() {
       if ($slideElement.current) {
         if (!activeStageIndex) {
           return false;

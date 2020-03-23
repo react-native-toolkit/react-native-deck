@@ -12,19 +12,11 @@ import React, {
   Ref
 } from "react";
 import { View, ViewStyle, StyleSheet } from "react-native";
-import { SlideProps } from "./Slide";
+import { SlideProps, ISlideRef } from "./Slide";
 
 export interface DeckProps {
   children: ReturnType<ForwardRefExoticComponent<SlideProps>>[];
   containerStyle?: ViewStyle;
-}
-
-export interface ISlideNode {
-  nextStage: () => boolean;
-  prevStage: () => boolean;
-  jumpToLastStage: () => void;
-  stageCount: number;
-  activeStageIndex: number;
 }
 
 export interface IDeckRef {
@@ -54,7 +46,7 @@ const Deck = forwardRef(
     const [slides, setSlides] = useState(children);
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
-    const $activeSlide = useRef<ISlideNode>(null);
+    const $activeSlide = useRef<ISlideRef>(null);
 
     useDidUpdate(
       useCallback(() => {
@@ -63,13 +55,6 @@ const Deck = forwardRef(
       }, [setSlides, setActiveSlideIndex, children]),
       [setSlides, setActiveSlideIndex, children]
     );
-
-    // useEffect(() => {
-    //   const childrenWithProps = Children.map(children, child =>
-    //     isValidElement(child) ? cloneElement(child, { ref: $activeSlide }) : null
-    //   );
-    //   setSlides(childrenWithProps);
-    // });
 
     useImperativeHandle(ref, () => ({
       get slideCount(): number {
