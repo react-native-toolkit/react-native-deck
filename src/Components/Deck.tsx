@@ -45,6 +45,7 @@ const Deck = forwardRef(
   ({ children, containerStyle }: DeckProps, ref: Ref<IDeckRef>) => {
     const [slides, setSlides] = useState(children);
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+    const [lastUpdateHash, setLastUpdateHash] = useState(Math.random());
 
     const $activeSlide = useRef<ISlideRef>(null);
 
@@ -101,16 +102,18 @@ const Deck = forwardRef(
               return;
             }
             setActiveSlideIndex(activeSlideIndex - 1);
-            setTimeout(() => {
-              const newActiveSlideNode = $activeSlide.current;
-              if (newActiveSlideNode) {
-                newActiveSlideNode.jumpToLastStage();
-              }
-            });
+            setTimeout(() => setLastUpdateHash(Math.random()));
           }
         }
       }
     }));
+
+    useDidUpdate(() => {
+      const newActiveSlideNode = $activeSlide.current;
+      if (newActiveSlideNode) {
+        newActiveSlideNode.jumpToLastStage();
+      }
+    }, [lastUpdateHash]);
 
     return (
       <View style={[styles.deckContainer, containerStyle]}>
