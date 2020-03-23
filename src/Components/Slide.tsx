@@ -7,7 +7,8 @@ import React, {
   useEffect,
   Children,
   cloneElement,
-  isValidElement
+  isValidElement,
+  Ref
 } from "react";
 
 export interface SlideProps {
@@ -21,7 +22,15 @@ export interface ISlideElement {
   setState: (arg1: object) => any;
 }
 
-const Slide = forwardRef(({ children }: SlideProps, ref) => {
+export interface ISlideRef {
+  readonly stageCount: number;
+  readonly activeStageIndex: number;
+  nextStage(): boolean;
+  prevState(): boolean;
+  jumpToLastStage(): false;
+}
+
+const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
   const [ChildNode, setChildNode] = useState<ReactNode>(null);
   const [activeStageIndex, setActiveStageIndex] = useState(0);
 
