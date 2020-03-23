@@ -1,101 +1,91 @@
 import React, {
+  ReactNode,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useEffect,
   Children,
   cloneElement,
-  createRef,
-  ReactNode,
-  Fragment,
-  Component
+  isValidElement
 } from "react";
 
 export interface SlideProps {
   children: ReactNode;
-  nextStage: () => boolean;
-  prevStage: () => boolean;
-}
-
-export interface SlideState {
-  ChildNode: ReactNode;
-  activeStageIndex: number;
+  nextStage?: () => boolean;
+  prevStage?: () => boolean;
 }
 
 export interface ISlideElement {
-  current: {
-    stages: object[];
-    setState: (arg1: object) => any;
-  };
+  stages: object[];
+  setState: (arg1: object) => any;
 }
 
-class Slide extends Component<SlideProps, SlideState> {
-  state = {
-    ChildNode: null,
-    activeStageIndex: 0
-  };
-  $slideElement: ISlideElement = createRef() as ISlideElement;
+const Slide = forwardRef(({ children }: SlideProps, ref) => {
+  const [ChildNode, setChildNode] = useState<ReactNode>(null);
+  const [activeStageIndex, setActiveStageIndex] = useState(0);
 
-  get stageCount(): number {
-    if (this.$slideElement.current) {
-      const { stages = [] } = this.$slideElement.current;
-      return stages.length;
-    } else {
-      return 0;
+  const $slideElement = useRef<ISlideElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    get stageCount(): number {
+      return activeStageIndex;
+    },
+    get activeStageIndex(): number {
+      return activeStageIndex;
+    },
+    nextStage() {
+      if ($slideElement.current) {
+        const { stages = [] } = $slideElement.current;
+        const newStageIndex = activeStageIndex + 1;
+        if (newStageIndex === stages.length) {
+          return false;
+        }
+        const newState = stages[newStageIndex];
+        $slideElement.current.setState(newState);
+        setActiveStageIndex(newStageIndex);
+        return true;
+      }
+      return false;
+    },
+    prevState() {
+      if ($slideElement.current) {
+        if (!activeStageIndex) {
+          return false;
+        }
+        const { stages = [] } = $slideElement.current;
+        const newStageIndex = activeStageIndex - 1;
+        const newState = stages[newStageIndex];
+        $slideElement.current.setState(newState);
+        setActiveStageIndex(newStageIndex);
+        return true;
+      }
+      return false;
+    },
+    jumpToLastStage() {
+      if ($slideElement.current) {
+        const { stages = [] } = $slideElement.current;
+        const newStageIndex = stages.length - 1;
+        const newState = stages[newStageIndex];
+        $slideElement.current.setState(newState);
+        setActiveStageIndex(newStageIndex);
+      }
+      return false;
     }
-  }
+  }));
 
-  get activeStageIndex(): number {
-    return this.state.activeStageIndex;
-  }
-
-  setChildNode = (node: ReactNode) => this.setState({ ChildNode: node });
-
-  setActiveStageIndex = (index: number) =>
-    this.setState({ activeStageIndex: index });
-
-  componentDidMount() {
-    const childrenWithProps = Children.map(this.props.children, child =>
-      cloneElement(child, {
-        ref: this.$slideElement
-      })
+  useEffect(() => {
+    const childrenWithProps = Children.map(children, child =>
+      isValidElement(child)
+        ? cloneElement(child, {
+            ref: $slideElement
+          })
+        : null
     );
-    this.setChildNode(childrenWithProps);
-  }
+    setChildNode(childrenWithProps);
+  }, [children]);
 
-  nextStage = () => {
-    const { stages = [] } = this.$slideElement.current;
-    const newStageIndex = this.state.activeStageIndex + 1;
-    if (newStageIndex === stages.length) {
-      return false;
-    }
-    const newState = stages[newStageIndex];
-    this.$slideElement.current.setState(newState);
-    this.setActiveStageIndex(newStageIndex);
-    return true;
-  };
-
-  prevStage = () => {
-    if (!this.state.activeStageIndex) {
-      return false;
-    }
-    const { stages = [] } = this.$slideElement.current;
-    const newStageIndex = this.state.activeStageIndex - 1;
-    const newState = stages[newStageIndex];
-    this.$slideElement.current.setState(newState);
-    this.setActiveStageIndex(newStageIndex);
-    return true;
-  };
-
-  jumpToLastStage = () => {
-    const { stages = [] } = this.$slideElement.current;
-    const newStageIndex = stages.length - 1;
-    const newState = stages[newStageIndex];
-    this.$slideElement.current.setState(newState);
-    this.setActiveStageIndex(newStageIndex);
-  };
-
-  render() {
-    const { ChildNode } = this.state;
-
-    return <Fragment>{ChildNode}</Fragment>;
-  }
-}
+  return <>{ChildNode}</>;
+});
 
 export default Slide;

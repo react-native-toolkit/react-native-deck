@@ -1,24 +1,24 @@
 import React, {
-  Component,
-  ReactNode,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
   Children,
   cloneElement,
-  createRef,
-  RefObject
+  isValidElement,
+  ForwardRefExoticComponent
 } from "react";
-import { View, StyleSheet, ViewStyle } from "react-native";
+import { View, ViewStyle, StyleSheet } from "react-native";
+import { SlideProps } from "./Slide";
 
 export interface DeckProps {
-  children: ReactNode;
+  children: ReturnType<ForwardRefExoticComponent<SlideProps>>[];
   containerStyle?: ViewStyle;
 }
 
-export interface DeckState {
-  slides: ReactNode[];
-  activeSlideIndex: number;
-}
-
-export interface SlideNode {
+export interface ISlideNode {
   nextStage: () => boolean;
   prevStage: () => boolean;
   jumpToLastStage: () => void;
@@ -26,101 +26,76 @@ export interface SlideNode {
   activeStageIndex: number;
 }
 
-export interface SlideInterface extends RefObject<SlideNode> {
-  current: SlideNode | null;
-}
+const useDidUpdate = (callback: () => any, deps: any[]) => {
+  const hasMount = useRef(false);
 
-class Deck extends Component<DeckProps, DeckState> {
-  state = {
-    slides: [],
-    activeSlideIndex: 0
-  };
-  $activeSlide: SlideInterface = createRef();
-
-  get slideCount() {
-    return this.state.slides.length;
-  }
-
-  get activeSlideIndex() {
-    return this.state.activeSlideIndex;
-  }
-
-  get slideStageCount() {
-    if (this.$activeSlide.current) {
-      const { stageCount = 0 } = this.$activeSlide.current;
-      return stageCount;
+  useEffect(() => {
+    if (hasMount.current) {
+      callback();
     } else {
-      return 0;
+      hasMount.current = true;
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+};
 
-  get slideActiveStageIndex() {
-    if (this.$activeSlide.current) {
-      const { activeStageIndex = 0 } = this.$activeSlide.current;
-      return activeStageIndex;
-    } else {
-      return 0;
-    }
-  }
+const Deck = forwardRef(({ children, containerStyle }: DeckProps, ref) => {
+  const [slides, setSlides] = useState(children);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
-  setSlides = (childrenWithProps: ReactNode[]) =>
-    this.setState({ slides: childrenWithProps });
+  const $activeSlide = useRef<ISlideNode>(null);
 
-  setActiveSlideIndex = (nextSlideIndex: number) =>
-    this.setState({ activeSlideIndex: nextSlideIndex });
+  useDidUpdate(
+    useCallback(() => {
+      setSlides(children);
+      setActiveSlideIndex(0);
+    }, [setSlides, setActiveSlideIndex, children]),
+    [setSlides, setActiveSlideIndex, children]
+  );
 
-  componentDidMount() {
-    const { children } = this.props;
-    const childrenWithProps = Children.map(children, child =>
-      cloneElement(child, { ref: this.$activeSlide })
-    );
-    this.setSlides(childrenWithProps);
-  }
+  // useEffect(() => {
+  //   const childrenWithProps = Children.map(children, child =>
+  //     isValidElement(child) ? cloneElement(child, { ref: $activeSlide }) : null
+  //   );
+  //   setSlides(childrenWithProps);
+  // });
 
-  nextSlide = () => {
-    const { activeSlideIndex, slides } = this.state;
-    const activeSlideNode = this.$activeSlide.current;
-    if (activeSlideNode) {
-      if (!activeSlideNode.nextStage()) {
-        const nextSlideIndex = activeSlideIndex + 1;
-        if (nextSlideIndex === slides.length) {
-          return;
-        }
-        this.setActiveSlideIndex(nextSlideIndex);
+  useImperativeHandle(ref, () => ({
+    get slideCount(): number {
+      return slides.length;
+    },
+    get activeSlideIndex(): number {
+      return activeSlideIndex;
+    },
+    get slideStageCount(): number {
+      if ($activeSlide.current) {
+        const { stageCount = 0 } = $activeSlide.current;
+        return stageCount;
+      } else {
+        return 0;
+      }
+    },
+
+    get slideActiveStageIndex() {
+      if ($activeSlide.current) {
+        const { activeStageIndex = 0 } = $activeSlide.current;
+        return activeStageIndex;
+      } else {
+        return 0;
       }
     }
-  };
+  }));
 
-  prevSlide = () => {
-    const { activeSlideIndex } = this.state;
-    const activeSlideNode = this.$activeSlide.current;
-    if (activeSlideNode) {
-      if (!activeSlideNode.prevStage()) {
-        if (!activeSlideIndex) {
-          return;
-        }
-        this.setActiveSlideIndex(activeSlideIndex - 1);
-        setTimeout(() => {
-          const newActiveSlideNode = this.$activeSlide.current;
-          if (newActiveSlideNode) {
-            newActiveSlideNode.jumpToLastStage();
-          }
-        });
-      }
-    }
-  };
-
-  render() {
-    const { containerStyle } = this.props;
-    const { slides = [], activeSlideIndex = 0 } = this.state;
-
-    return (
-      <View style={[styles.deckContainer, containerStyle]}>
-        {slides[activeSlideIndex]}
-      </View>
-    );
-  }
-}
+  return (
+    <View style={[styles.deckContainer, containerStyle]}>
+      {Children.map(slides[activeSlideIndex], child =>
+        isValidElement(child)
+          ? cloneElement(child, { ref: $activeSlide })
+          : null
+      )}
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   deckContainer: {
