@@ -9,7 +9,8 @@ import React, {
   cloneElement,
   isValidElement,
   ForwardRefExoticComponent,
-  Ref
+  Ref,
+  DependencyList
 } from "react";
 import { View, ViewStyle, StyleSheet } from "react-native";
 import { SlideProps, ISlideRef } from "./Slide";
@@ -29,7 +30,7 @@ export interface IDeckRef {
   prevSlide(): void;
 }
 
-const useDidUpdate = (callback: () => any, deps: any[]) => {
+const useDidUpdate = (callback: () => any, deps: DependencyList) => {
   const hasMount = useRef(false);
 
   useEffect(() => {
@@ -53,13 +54,12 @@ const Deck = forwardRef(
 
     const $activeSlide = useRef<ISlideRef>(null);
 
-    // useDidUpdate(
-    //   useCallback(() => {
-    //     setSlides(children);
-    //     setActiveSlideIndex(0);
-    //   }, [setSlides, setActiveSlideIndex, children]),
-    //   [setSlides, setActiveSlideIndex, children]
-    // );
+    useDidUpdate(
+      useCallback(() => {
+        setSlides(children);
+      }, [setSlides, children]),
+      [setSlides, children]
+    );
 
     useImperativeHandle(ref, () => ({
       get slideCount(): number {
