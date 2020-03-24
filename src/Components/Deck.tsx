@@ -17,6 +17,7 @@ import { SlideProps, ISlideRef } from "./Slide";
 export interface DeckProps {
   children: ReturnType<ForwardRefExoticComponent<SlideProps>>[];
   containerStyle?: ViewStyle;
+  onSlideChange?: () => any;
 }
 
 export interface IDeckRef {
@@ -42,20 +43,23 @@ const useDidUpdate = (callback: () => any, deps: any[]) => {
 };
 
 const Deck = forwardRef(
-  ({ children, containerStyle }: DeckProps, ref: Ref<IDeckRef>) => {
+  (
+    { children, containerStyle, onSlideChange = () => null }: DeckProps,
+    ref: Ref<IDeckRef>
+  ) => {
     const [slides, setSlides] = useState(children);
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
     const [lastUpdateHash, setLastUpdateHash] = useState(Math.random());
 
     const $activeSlide = useRef<ISlideRef>(null);
 
-    useDidUpdate(
-      useCallback(() => {
-        setSlides(children);
-        setActiveSlideIndex(0);
-      }, [setSlides, setActiveSlideIndex, children]),
-      [setSlides, setActiveSlideIndex, children]
-    );
+    // useDidUpdate(
+    //   useCallback(() => {
+    //     setSlides(children);
+    //     setActiveSlideIndex(0);
+    //   }, [setSlides, setActiveSlideIndex, children]),
+    //   [setSlides, setActiveSlideIndex, children]
+    // );
 
     useImperativeHandle(ref, () => ({
       get slideCount(): number {
@@ -92,6 +96,7 @@ const Deck = forwardRef(
             setActiveSlideIndex(nextSlideIndex);
           }
         }
+        setTimeout(() => onSlideChange(), 100);
       },
 
       prevSlide() {
@@ -105,6 +110,7 @@ const Deck = forwardRef(
             setTimeout(() => setLastUpdateHash(Math.random()));
           }
         }
+        setTimeout(() => onSlideChange(), 100);
       }
     }));
 

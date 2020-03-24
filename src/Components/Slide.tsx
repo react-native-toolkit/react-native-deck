@@ -38,7 +38,12 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
 
   useImperativeHandle(ref, () => ({
     get stageCount(): number {
-      return activeStageIndex;
+      if ($slideElement.current) {
+        const { stages = [] } = $slideElement.current;
+        return stages.length;
+      } else {
+        return 0;
+      }
     },
     get activeStageIndex(): number {
       return activeStageIndex;
