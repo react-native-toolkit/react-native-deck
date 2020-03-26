@@ -28,7 +28,7 @@ export interface ISlideRef {
   readonly activeStageIndex: number;
   nextStage(): boolean;
   prevStage(): boolean;
-  jumpToLastStage(): false;
+  jumpToLastStage(): boolean;
 }
 
 const cloneSlides = (children: ReactNode, slideRef: RefObject<ISlideElement>) =>
@@ -93,6 +93,7 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
         const newState = stages[newStageIndex];
         $slideElement.current.setState(newState);
         setActiveStageIndex(newStageIndex);
+        return true;
       }
       return false;
     }
