@@ -8,7 +8,8 @@ import React, {
   Children,
   cloneElement,
   isValidElement,
-  Ref
+  Ref,
+  RefObject
 } from "react";
 
 export interface SlideProps {
@@ -29,6 +30,15 @@ export interface ISlideRef {
   prevStage(): boolean;
   jumpToLastStage(): false;
 }
+
+const cloneSlides = (children: ReactNode, slideRef: RefObject<ISlideElement>) =>
+  Children.map(children, child =>
+    isValidElement(child)
+      ? cloneElement(child, {
+          ref: slideRef
+        })
+      : null
+  );
 
 const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
   const [ChildNode, setChildNode] = useState<ReactNode>(null);
@@ -89,17 +99,11 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
   }));
 
   useEffect(() => {
-    const childrenWithProps = Children.map(children, child =>
-      isValidElement(child)
-        ? cloneElement(child, {
-            ref: $slideElement
-          })
-        : null
-    );
+    const childrenWithProps = cloneSlides(children, $slideElement);
     setChildNode(childrenWithProps);
   }, [children]);
 
-  return <>{ChildNode}</>;
+  return <>{ChildNode ? ChildNode : cloneSlides(children, $slideElement)}</>;
 });
 
 export default Slide;
