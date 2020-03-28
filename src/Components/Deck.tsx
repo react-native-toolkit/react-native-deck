@@ -21,11 +21,14 @@ export interface DeckProps {
   onSlideChange?: () => any;
 }
 
-export interface IDeckRef {
+export interface IDeckStatus {
   readonly slideCount: number;
   readonly activeSlideIndex: number;
   readonly slideStageCount: number;
   readonly slideActiveStageIndex: number;
+}
+
+export interface IDeckRef extends IDeckStatus {
   nextSlide(): void;
   prevSlide(): void;
 }
