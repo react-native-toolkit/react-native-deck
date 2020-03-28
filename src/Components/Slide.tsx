@@ -62,7 +62,7 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
       if ($slideElement.current) {
         const { stages = [] } = $slideElement.current;
         const newStageIndex = activeStageIndex + 1;
-        if (newStageIndex === stages.length) {
+        if (newStageIndex >= stages.length) {
           return false;
         }
         const newState = stages[newStageIndex];
