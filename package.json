@@ -1,12 +1,19 @@
 {
   "name": "react-native-deck",
   "version": "0.0.1",
-  "description": "Create cross platform slides & real world presentations in your react native project",
-  "main": "lib/index.js",
+  "description": "Create cross platform slides & real world presentations using react native",
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
+  "react-native": "src/index.tsx",
+  "types": "lib/typescript/index.d.ts",
+  "files": [
+    "lib/",
+    "src/"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./lib && tsc -p .",
-    "prepublish": "yarn build"
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "prepare": "bob build"
   },
   "keywords": [
     "react",
@@ -15,6 +22,20 @@
     "slides",
     "presentation"
   ],
+  "@react-native-community/bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "commonjs",
+        {
+          "copyFlow": true
+        }
+      ],
+      "module",
+      "typescript"
+    ]
+  },
   "author": "DaniAkash <s.daniakash@gmail.com> (https://github.com/DaniAkash)",
   "license": "MIT",
   "dependencies": {},
@@ -34,6 +55,8 @@
     "metro-react-native-babel-preset": "^0.59.0",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
+    "react": "^16.13.1",
+    "react-native": "^0.62.0",
     "react-test-renderer": "^16.13.1",
     "typescript": "^3.8.3"
   },
