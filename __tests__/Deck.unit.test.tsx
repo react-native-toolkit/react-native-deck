@@ -203,5 +203,16 @@ describe("Testing Deck Component", () => {
     const element8 = getByText("Stage3");
     expect(element8).toBeTruthy();
     expect(deckProps?.deckStatus?.slideActiveStageIndex).toBe(2);
+
+    /**
+     * Move one step backward
+     */
+    await act(async () => {
+      deckProps?.prevSlide();
+      await new Promise(r => setTimeout(r, 200));
+    });
+    const element9 = getByText("Stage2");
+    expect(element9).toBeTruthy();
+    expect(deckProps?.deckStatus?.slideActiveStageIndex).toBe(1);
   });
 });
