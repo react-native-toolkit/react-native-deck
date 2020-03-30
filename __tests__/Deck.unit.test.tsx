@@ -18,7 +18,7 @@ import { View, Text } from "react-native";
 import { render, cleanup, act } from "@testing-library/react-native";
 import useSlideControl from "../src/Components/useSlideControl";
 
-afterEach(cleanup);
+afterAll(cleanup);
 
 type deckPropsType = {
   nextSlide?: () => any;
@@ -99,20 +99,22 @@ const DeckComponent = ({ deckProps }: { deckProps: deckPropsType }) => {
   );
 };
 describe("Testing Deck Component", () => {
-  it("Renders Deck", async () => {
-    const deckProps: deckPropsType = {};
-    const tree = render(<DeckComponent deckProps={deckProps} />);
+  const deckProps: deckPropsType = {};
+  const tree = render(<DeckComponent deckProps={deckProps} />);
+  const { getByText } = tree;
 
+  it("Renders Deck", async () => {
     expect(deckProps?.deckStatus?.slideCount).toBe(4);
 
     /**
      * First Deck Render
      */
-    const { getByText } = tree;
     const element = getByText("Hello");
     expect(element).toBeTruthy();
     expect(deckProps?.deckStatus?.activeSlideIndex).toBe(0);
+  });
 
+  it("Moving between slides", async () => {
     /**
      * Moving one slide forward
      */
@@ -134,7 +136,9 @@ describe("Testing Deck Component", () => {
     const element3 = getByText("Hello");
     expect(element3).toBeTruthy();
     expect(deckProps?.deckStatus?.activeSlideIndex).toBe(0);
+  });
 
+  it("Testing slides with multiple stages", async () => {
     /**
      * Moving to Third slide
      */
