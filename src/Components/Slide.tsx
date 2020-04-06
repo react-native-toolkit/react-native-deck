@@ -11,16 +11,12 @@ import React, {
   Ref,
   RefObject
 } from "react";
+import { ISlideComponent } from "./useSlideControl";
 
 export interface SlideProps {
   children: ReactNode;
   nextStage?: () => boolean;
   prevStage?: () => boolean;
-}
-
-export interface ISlideElement {
-  stages: object[];
-  setState: (arg1: object) => any;
 }
 
 export interface ISlideRef {
@@ -31,7 +27,10 @@ export interface ISlideRef {
   jumpToLastStage(): boolean;
 }
 
-const cloneSlides = (children: ReactNode, slideRef: RefObject<ISlideElement>) =>
+const cloneSlides = (
+  children: ReactNode,
+  slideRef: RefObject<ISlideComponent>
+) =>
   Children.map(children, child =>
     isValidElement(child)
       ? cloneElement(child, {
@@ -44,7 +43,7 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
   const [ChildNode, setChildNode] = useState<ReactNode>(null);
   const [activeStageIndex, setActiveStageIndex] = useState(0);
 
-  const $slideElement = useRef<ISlideElement>(null);
+  const $slideElement = useRef<ISlideComponent>(null);
 
   useImperativeHandle(ref, () => ({
     get stageCount(): number {
@@ -60,7 +59,7 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
     },
     nextStage() {
       if ($slideElement.current) {
-        const { stages = [] } = $slideElement.current;
+        const { stages = [], slideActions } = $slideElement.current;
         const newStageIndex = activeStageIndex + 1;
         if (newStageIndex >= stages.length) {
           return false;
@@ -68,6 +67,14 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
         const newState = stages[newStageIndex];
         $slideElement.current.setState(newState);
         setActiveStageIndex(newStageIndex);
+        if (
+          slideActions &&
+          slideActions[newStageIndex] &&
+          slideActions[newStageIndex].forward
+        ) {
+          // @ts-ignore
+          slideActions[newStageIndex].forward();
+        }
         return true;
       }
       return false;
@@ -77,22 +84,38 @@ const Slide = forwardRef(({ children }: SlideProps, ref: Ref<ISlideRef>) => {
         if (!activeStageIndex) {
           return false;
         }
-        const { stages = [] } = $slideElement.current;
+        const { stages = [], slideActions } = $slideElement.current;
         const newStageIndex = activeStageIndex - 1;
         const newState = stages[newStageIndex];
         $slideElement.current.setState(newState);
         setActiveStageIndex(newStageIndex);
+        if (
+          slideActions &&
+          slideActions[newStageIndex + 1] &&
+          slideActions[newStageIndex + 1].backward
+        ) {
+          // @ts-ignore
+          slideActions[newStageIndex + 1].backward();
+        }
         return true;
       }
       return false;
     },
     jumpToLastStage() {
       if ($slideElement.current) {
-        const { stages = [] } = $slideElement.current;
+        const { stages = [], slideActions } = $slideElement.current;
         const newStageIndex = stages.length - 1;
         const newState = stages[newStageIndex];
         $slideElement.current.setState(newState);
         setActiveStageIndex(newStageIndex);
+        if (
+          slideActions &&
+          slideActions[newStageIndex] &&
+          slideActions[newStageIndex].forward
+        ) {
+          // @ts-ignore
+          slideActions[newStageIndex].forward();
+        }
         return true;
       }
       return false;

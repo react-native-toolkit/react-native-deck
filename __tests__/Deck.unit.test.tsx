@@ -26,18 +26,42 @@ type deckPropsType = {
   deckStatus?: IDeckStatus | null;
 };
 
+type SlideDirectionType = "forward" | "backward" | "none";
+
+let stageSlideDirection: SlideDirectionType = "none";
+
 const SlideWithStages = forwardRef((props, ref: Ref<ISlideComponent>) => {
-  const activeState = useSlideControl(ref, [
-    {
-      stage: 1
-    },
-    {
-      stage: 2
-    },
-    {
-      stage: 3
-    }
-  ]);
+  const [slideDirection, setSlideDirection] = useState<SlideDirectionType>(
+    "none"
+  );
+
+  const activeState = useSlideControl(
+    ref,
+    [
+      {
+        stage: 1
+      },
+      {
+        stage: 2
+      },
+      {
+        stage: 3
+      }
+    ],
+    [
+      {},
+      {},
+      {
+        forward: () => setSlideDirection("forward"),
+        backward: () => setSlideDirection("backward")
+      }
+    ]
+  );
+
+  useEffect(() => {
+    stageSlideDirection = slideDirection;
+  });
+
   return (
     <View>
       {activeState.stage === 1 && <Text>Stage1</Text>}
@@ -181,6 +205,8 @@ describe("Testing Deck Component", () => {
     const element6 = getByText("Stage3");
     expect(element6).toBeTruthy();
     expect(deckProps?.deckStatus?.slideActiveStageIndex).toBe(2);
+    // Testing Slide Actions
+    expect(stageSlideDirection).toBe("forward");
 
     /**
      * Move to final stage
@@ -203,6 +229,8 @@ describe("Testing Deck Component", () => {
     const element8 = getByText("Stage3");
     expect(element8).toBeTruthy();
     expect(deckProps?.deckStatus?.slideActiveStageIndex).toBe(2);
+    // Testing Slide Actions
+    expect(stageSlideDirection).toBe("forward");
 
     /**
      * Move one step backward
@@ -214,5 +242,7 @@ describe("Testing Deck Component", () => {
     const element9 = getByText("Stage2");
     expect(element9).toBeTruthy();
     expect(deckProps?.deckStatus?.slideActiveStageIndex).toBe(1);
+    // Testing Slide Actions
+    expect(stageSlideDirection).toBe("backward");
   });
 });
